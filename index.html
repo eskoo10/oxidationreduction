@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>산화-환원 반응 가상 실험실 & 개념 퀴즈</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation with Tabs -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-2.5 shadow-sm">
+        <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg text-slate-900 flex items-center gap-2">
+                        통합과학 가상실험실 <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold border border-indigo-200">산화 · 환원</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">금속의 반응성 차이에 따른 전자의 이동과 이온 변화 시뮬레이션</p>
+                </div>
+            </div>
+
+            <!-- Main Tab Switcher -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button id="tab-btn-lab" onclick="switchTab('lab')" class="px-4 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm">
+                    <i data-lucide="flask-conical" class="w-4 h-4"></i> 🧪 가상 실험실
+                </button>
+                <button id="tab-btn-quiz" onclick="switchTab('quiz')" class="px-4 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i> 📝 개념 확인 퀴즈
+                </button>
+            </div>
+
+            <!-- Top Action Controls (Lab Mode Only) -->
+            <div id="lab-top-actions" class="flex items-center gap-3">
+                <div id="status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-slate-400"></span> 실험 대기 중
+                </div>
+                <button id="btn-submerge" onclick="toggleSubmerge()" class="px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white shadow-sm transition flex items-center gap-1.5">
+                    <i data-lucide="arrow-down-circle" class="w-4 h-4"></i> <span id="btn-submerge-text">수용액에 담그기</span>
+                </button>
+                <button onclick="resetLab()" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition" title="초기화">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- VIEW 1: Virtual Lab Section -->
+    <main id="view-lab" class="flex-1 max-w-[1600px] w-full mx-auto p-3 md:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+        <!-- LEFT PANEL: Experimental Setup & Metal Activity (3 cols) -->
+        <section class="lg:col-span-3 flex flex-col gap-3">
+            
+            <!-- 1. Metal Selection -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i> 1. 금속판 선택 (전자 제공자)
+                </h2>
+                <div class="grid grid-cols-2 gap-2" id="metal-selector">
+                    <button onclick="selectMetal('Zn')" id="metal-Zn" class="metal-btn p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 text-left transition hover:bg-indigo-50">
+                        <div class="font-bold text-slate-900 text-sm">아연 (Zn)</div>
+                        <div class="text-[11px] text-indigo-600 font-medium">반응성: 높음</div>
+                    </button>
+                    <button onclick="selectMetal('Fe')" id="metal-Fe" class="metal-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300">
+                        <div class="font-bold text-slate-800 text-sm">철 (Fe)</div>
+                        <div class="text-[11px] text-slate-500">반응성: 중간</div>
+                    </button>
+                    <button onclick="selectMetal('Cu')" id="metal-Cu" class="metal-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300">
+                        <div class="font-bold text-slate-800 text-sm">구리 (Cu)</div>
+                        <div class="text-[11px] text-slate-500">반응성: 낮음</div>
+                    </button>
+                    <button onclick="selectMetal('Ag')" id="metal-Ag" class="metal-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300">
+                        <div class="font-bold text-slate-800 text-sm">은 (Ag)</div>
+                        <div class="text-[11px] text-slate-500">반응성: 매우 낮음</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Solution Selection -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+                <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <i data-lucide="droplet" class="w-4 h-4 text-cyan-600"></i> 2. 수용액 선택 (양이온 수용체)
+                </h2>
+                <div class="space-y-1.5" id="solution-selector">
+                    <button onclick="selectSolution('CuSO4')" id="sol-CuSO4" class="sol-btn w-full p-2 rounded-xl border-2 border-cyan-600 bg-cyan-50/60 text-left transition flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-900 block text-xs md:text-sm">황산 구리 수용액 (CuSO₄)</span>
+                            <span class="text-[11px] text-cyan-700 font-medium">Cu²⁺ 이온 (푸른색)</span>
+                        </div>
+                        <span class="w-3 h-3 rounded-full bg-blue-500 ring-2 ring-blue-200"></span>
+                    </button>
+                    <button onclick="selectSolution('AgNO3')" id="sol-AgNO3" class="sol-btn w-full p-2 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-800 block text-xs md:text-sm">질산 은 수용액 (AgNO₃)</span>
+                            <span class="text-[11px] text-slate-500">Ag⁺ 이온 (무색)</span>
+                        </div>
+                        <span class="w-3 h-3 rounded-full bg-slate-300 border border-slate-400"></span>
+                    </button>
+                    <button onclick="selectSolution('ZnSO4')" id="sol-ZnSO4" class="sol-btn w-full p-2 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-800 block text-xs md:text-sm">황산 아연 수용액 (ZnSO₄)</span>
+                            <span class="text-[11px] text-slate-500">Zn²⁺ 이온 (무색)</span>
+                        </div>
+                        <span class="w-3 h-3 rounded-full bg-zinc-400"></span>
+                    </button>
+                    <button onclick="selectSolution('HCl')" id="sol-HCl" class="sol-btn w-full p-2 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-800 block text-xs md:text-sm">묽은 염산 (HCl)</span>
+                            <span class="text-[11px] text-slate-500">H⁺ 이온 (수소 기체 발생)</span>
+                        </div>
+                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metal Reactivity Activity Series Bar -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
+                <div class="text-xs font-semibold text-slate-600 mb-1.5 flex justify-between items-center">
+                    <span>금속의 이온화 경향성</span>
+                    <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-1.5 py-0.5 rounded">산화 되기 쉬움 ➔</span>
+                </div>
+                <div class="flex items-center justify-between text-center code-font text-xs font-bold text-slate-700 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                    <span id="act-Zn" class="px-1.5 py-0.5 rounded transition">Zn</span>
+                    <span class="text-slate-400 text-[10px]">&gt;</span>
+                    <span id="act-Fe" class="px-1.5 py-0.5 rounded transition">Fe</span>
+                    <span class="text-slate-400 text-[10px]">&gt;</span>
+                    <span id="act-H" class="px-1.5 py-0.5 rounded transition text-amber-600">(H)</span>
+                    <span class="text-slate-400 text-[10px]">&gt;</span>
+                    <span id="act-Cu" class="px-1.5 py-0.5 rounded transition">Cu</span>
+                    <span class="text-slate-400 text-[10px]">&gt;</span>
+                    <span id="act-Ag" class="px-1.5 py-0.5 rounded transition">Ag</span>
+                </div>
+            </div>
+
+            <!-- Quick Concept Note -->
+            <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3 text-xs space-y-1 text-slate-700 mt-auto">
+                <div class="font-bold text-indigo-900 flex items-center gap-1">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 text-indigo-600"></i> 핵심 요약
+                </div>
+                <p class="text-[11px] text-slate-600 leading-snug">
+                    • <strong>산화(Oxidation)</strong>: 전자를 잃고 양이온으로 녹아 나옴.<br>
+                    • <strong>환원(Reduction)</strong>: 수용액 속 양이온이 전자를 얻어 금속으로 석출됨.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- MIDDLE PANEL: Interactive Microscopic Simulation Canvas (5 cols) -->
+        <section class="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-3.5 flex flex-col justify-between shadow-sm relative overflow-hidden">
+            
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                        <i data-lucide="eye" class="w-4 h-4 text-indigo-600"></i> 미시적 입자 반응 관찰 (Micro View)
+                    </h3>
+                </div>
+                <!-- Speed Controls -->
+                <div class="flex items-center gap-1 text-xs">
+                    <span class="text-slate-400 text-[11px] mr-1">속도</span>
+                    <button onclick="setSpeed(1)" id="spd-1" class="px-2 py-0.5 rounded-lg bg-indigo-600 text-white font-medium text-xs">1x</button>
+                    <button onclick="setSpeed(2)" id="spd-2" class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs">2x</button>
+                    <button onclick="setSpeed(4)" id="spd-4" class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs">4x</button>
+                </div>
+            </div>
+
+            <!-- Simulation Canvas Box -->
+            <div class="relative flex-1 my-2 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-xl border border-slate-200 overflow-hidden min-h-[340px] flex items-center justify-center">
+                <canvas id="simCanvas" class="w-full h-full block cursor-pointer"></canvas>
+                
+                <!-- Particle Legend Overlay -->
+                <div class="absolute bottom-2.5 left-2.5 bg-white/90 backdrop-blur border border-slate-200 px-2.5 py-1.5 rounded-xl text-[11px] space-y-1 text-slate-700 shadow-sm pointer-events-none">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block ring-1 ring-amber-300"></span>
+                        <span>전자 ($e^-$) 이동</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                        <span id="guide-cation">양이온</span>
+                    </div>
+                </div>
+
+                <!-- No Reaction Alert Overlay -->
+                <div id="no-react-msg" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
+                    <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-600 mb-2.5">
+                        <i data-lucide="alert-circle" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-base mb-1">화학 반응이 일어나지 않습니다</h4>
+                    <p id="no-react-reason" class="text-xs text-slate-600 max-w-xs leading-relaxed">
+                        금속판의 반응성이 수용액 속 양이온보다 작거나 같기 때문에 전자를 잃지 않습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Live Status Indicator Banner -->
+            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-500">실시간 이온 반응 현황:</span>
+                    <span id="live-cation-count" class="font-bold code-font text-indigo-600">녹아 나온 양이온: 0개</span>
+                </div>
+                <div id="live-deposit-status" class="text-slate-600 font-medium text-[11px]">
+                    석출 진행 중...
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANEL: Chemical Equations & Real-time Chart (4 cols) -->
+        <section class="lg:col-span-4 flex flex-col gap-3">
+            
+            <!-- Chemical Equation Inspector Box -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm space-y-2.5">
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="file-text" class="w-4 h-4 text-emerald-600"></i> 반응식 & 반반응식 분석
+                    </h3>
+                    <button onclick="copyReactionEquations()" class="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 transition flex items-center gap-1 active:scale-95" title="화학 반응식 복사">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-500"></i>
+                        <span>반응식 복사</span>
+                    </button>
+                </div>
+
+                <!-- Overall Equation -->
+                <div class="p-2.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-center">
+                    <span class="text-[10px] text-emerald-800 font-bold block mb-0.5">전체 화학 반응식</span>
+                    <div id="eq-overall" class="code-font font-bold text-emerald-700 text-xs md:text-sm">
+                        -
+                    </div>
+                </div>
+
+                <!-- Oxidation and Reduction Half-Reactions Grid -->
+                <div class="grid grid-cols-1 gap-2 text-xs">
+                    <div class="p-2 bg-rose-50/70 border border-rose-200/80 rounded-xl">
+                        <div class="flex items-center justify-between mb-0.5">
+                            <span class="font-bold text-rose-700 flex items-center gap-1">
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i> 산화 반응 (Oxidation)
+                            </span>
+                            <span class="text-[10px] text-rose-600">전자 잃음</span>
+                        </div>
+                        <div id="eq-ox" class="code-font text-slate-800 font-semibold text-xs">
+                            -
+                        </div>
+                    </div>
+
+                    <div class="p-2 bg-blue-50/70 border border-blue-200/80 rounded-xl">
+                        <div class="flex items-center justify-between mb-0.5">
+                            <span class="font-bold text-blue-700 flex items-center gap-1">
+                                <i data-lucide="arrow-down-right" class="w-3.5 h-3.5"></i> 환원 반응 (Reduction)
+                            </span>
+                            <span class="text-[10px] text-blue-600">전자 얻음</span>
+                        </div>
+                        <div id="eq-red" class="code-font text-slate-800 font-semibold text-xs">
+                            -
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Quantitative Data Chart -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm flex-1 flex flex-col justify-between space-y-2">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-purple-600"></i> 수용액 속 이온 수 변화
+                    </h3>
+                    <span class="text-[10px] text-slate-400">시간 경과 ($t$)</span>
+                </div>
+
+                <!-- Canvas Chart Container -->
+                <div class="relative w-full h-36 bg-slate-50 rounded-xl p-2 border border-slate-200">
+                    <canvas id="chartCanvas"></canvas>
+                </div>
+
+                <!-- Key Metrics Cards -->
+                <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                    <div class="p-2 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block text-[10px]">이동한 총 전자 수</span>
+                        <span id="metric-electrons" class="font-bold text-amber-600 code-font text-sm">0 e⁻</span>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block text-[10px]">금속판 질량 변화</span>
+                        <span id="metric-mass" class="font-bold text-purple-700 code-font text-sm">0.00 g</span>
+                    </div>
+                </div>
+
+                <!-- Copy Experiment Report Summary Button -->
+                <button onclick="copyExperimentSummary()" class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-200 transition flex items-center justify-center gap-1.5 active:scale-95">
+                    <i data-lucide="clipboard-copy" class="w-4 h-4"></i>
+                    <span>실험 결과 요약 복사하기</span>
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- VIEW 2: Interactive Quiz Section -->
+    <main id="view-quiz" class="hidden flex-1 max-w-[900px] w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+            
+            <!-- Quiz Header Bar -->
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">통합과학 산화·환원 체크</span>
+                    <h2 class="text-xl font-bold text-slate-900 mt-1">개념 확인 퀴즈</h2>
+                </div>
+                <div class="text-right">
+                    <span id="quiz-progress-text" class="text-sm font-bold text-slate-700 code-font">문제 1 / 5</span>
+                    <div class="w-28 h-2 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+                        <div id="quiz-progress-bar" class="h-full bg-indigo-600 transition-all duration-300 w-1/5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Question Container -->
+            <div id="quiz-container" class="space-y-5">
+                <h3 id="quiz-question" class="text-base md:text-lg font-bold text-slate-800 leading-relaxed">
+                    질문 내용이 여기에 표시됩니다.
+                </h3>
+
+                <!-- Options List -->
+                <div id="quiz-options" class="space-y-2.5">
+                    <!-- Dynamic Answer Options inserted here -->
+                </div>
+
+                <!-- Explanation Box (Initially Hidden) -->
+                <div id="quiz-explanation-box" class="hidden p-4 rounded-2xl border text-xs md:text-sm space-y-1.5">
+                    <div class="font-bold flex items-center gap-1.5" id="quiz-result-title">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i> 정답입니다!
+                    </div>
+                    <p id="quiz-explanation-text" class="text-slate-600 leading-relaxed">
+                        해설 내용이 여기에 출력됩니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quiz Footer Controls -->
+            <div class="flex items-center justify-between pt-2">
+                <button onclick="prevQuizQuestion()" id="btn-quiz-prev" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 disabled:opacity-40 transition">
+                    이전 문제
+                </button>
+                <button onclick="nextQuizQuestion()" id="btn-quiz-next" class="px-5 py-2 rounded-xl text-xs md:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition">
+                    다음 문제
+                </button>
+            </div>
+
+            <!-- Final Quiz Score Summary (Initially Hidden) -->
+            <div id="quiz-summary" class="hidden text-center py-8 space-y-4">
+                <div class="w-16 h-16 bg-indigo-50 border border-indigo-100 rounded-full flex items-center justify-center mx-auto text-indigo-600">
+                    <i data-lucide="award" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900">퀴즈 완료!</h3>
+                    <p class="text-sm text-slate-500 mt-1">산화-환원 반응 개념 이해도 결과입니다.</p>
+                </div>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl max-w-xs mx-auto">
+                    <span class="text-xs text-slate-500 block">최종 점수</span>
+                    <span id="final-score-text" class="text-3xl font-black text-indigo-600 code-font">5 / 5</span>
+                </div>
+                <button onclick="restartQuiz()" class="px-6 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition inline-flex items-center gap-2">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 다시 풀기
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-2.5 px-4 text-center text-xs text-slate-500">
+        통합과학 교육용 가상 실험실 & 개념 검증 퀴즈 | 금속의 반응성 및 산화-환원 반응
+    </footer>
+
+    <!-- Toast Notification Popup -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900/90 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 backdrop-blur">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-msg">클립보드에 복사되었습니다.</span>
+    </div>
+
+    <!-- JavaScript Application Engine -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Chemical Constants & Data
+        const METALS = {
+            'Zn': { name: '아연', symbol: 'Zn', reactivity: 7, valency: 2, atomicMass: 65.38, color: '#94a3b8', border: '#64748b' },
+            'Fe': { name: '철', symbol: 'Fe', reactivity: 5, valency: 2, atomicMass: 55.85, color: '#78716c', border: '#57534e' },
+            'Cu': { name: '구리', symbol: 'Cu', reactivity: 2, valency: 2, atomicMass: 63.55, color: '#ea580c', border: '#c2410c' },
+            'Ag': { name: '은', symbol: 'Ag', reactivity: 1, valency: 1, atomicMass: 107.87, color: '#e2e8f0', border: '#94a3b8' }
+        };
+
+        const SOLUTIONS = {
+            'CuSO4': { name: '황산 구리', cationSymbol: 'Cu²⁺', cationReactivity: 2, valency: 2, liquidColor: 'rgba(59, 130, 246, 0.15)', cationColor: '#2563eb' },
+            'AgNO3': { name: '질산 은', cationSymbol: 'Ag⁺', cationReactivity: 1, valency: 1, liquidColor: 'rgba(241, 245, 249, 0.4)', cationColor: '#64748b' },
+            'ZnSO4': { name: '황산 아연', cationSymbol: 'Zn²⁺', cationReactivity: 7, valency: 2, liquidColor: 'rgba(241, 245, 249, 0.2)', cationColor: '#94a3b8' },
+            'HCl':   { name: '묽은 염산', cationSymbol: 'H⁺', cationReactivity: 3, valency: 1, liquidColor: 'rgba(251, 191, 36, 0.12)', cationColor: '#d97706' }
+        };
+
+        // Quiz Questions Data
+        const QUIZ_DATA = [
+            {
+                question: "아연(Zn) 조각을 황산 구리(CuSO₄) 수용액에 넣었을 때 일어나는 변화로 옳은 것은?",
+                options: [
+                    "아연은 전자를 얻어 환원된다.",
+                    "구리 이온(Cu²⁺)은 전자를 잃고 산화된다.",
+                    "아연판 표면에 붉은색 구리(Cu)가 석출된다.",
+                    "수용액의 푸른색이 점점 더 짙어진다."
+                ],
+                answer: 2,
+                explanation: "반응성이 큰 아연(Zn)은 전자를 잃고 산화되어 Zn²⁺로 녹아 나오고, 구리 이온(Cu²⁺)은 전자를 얻어 환원되어 아연판 표면에 붉은색 구리(Cu)로 석출됩니다. Cu²⁺ 이온이 줄어들므로 푸른색은 옅어집니다."
+            },
+            {
+                question: "구리(Cu)판을 질산 은(AgNO₃) 수용액에 넣었을 때, 수용액 속 전체 양이온 수의 변화는?",
+                options: [
+                    "전체 양이온 수가 증가한다.",
+                    "전체 양이온 수가 감소한다.",
+                    "전체 양이온 수에는 변화가 없다.",
+                    "음이온 수는 줄어들고 양이온 수는 늘어난다."
+                ],
+                answer: 1,
+                explanation: "Cu 1개가 녹아 나올 때 Cu²⁺(1개)가 되고, 은 이온 Ag⁺ 2개가 은(Ag)으로 석출됩니다. 즉 2개의 Ag⁺가 사라질 때 1개의 Cu²⁺가 생성되므로 수용액 속 전체 양이온 수는 감소합니다."
+            },
+            {
+                question: "다음 중 묽은 염산(HCl)과 반응하여 수소 기체(H₂)를 발생시킬 수 없는 금속은?",
+                options: [
+                    "아연 (Zn)",
+                    "철 (Fe)",
+                    "구리 (Cu)",
+                    "마그네슘 (Mg)"
+                ],
+                answer: 2,
+                explanation: "구리(Cu)는 수소(H)보다 이온화 경향(반응성)이 작기 때문에 묽은 염산 속 H⁺ 이온에 전자를 줄 수 없어 수소 기체가 발생하지 않습니다."
+            },
+            {
+                question: "산화-환원 반응에 대한 설명으로 옳지 않은 것은?",
+                options: [
+                    "산화와 환원은 항상 동시에 일어난다.",
+                    "전자를 잃는 반응을 산화라고 한다.",
+                    "전자를 얻는 반응을 환원이라고 한다.",
+                    "산화 반응에서 잃은 전자 수보다 환원 반응에서 얻은 전자 수가 더 많다."
+                ],
+                answer: 3,
+                explanation: "산화-환원 반응의 동시성에 의해, 산화될 때 잃은 총 전자 수와 환원될 때 얻은 총 전자 수는 항상 같습니다."
+            },
+            {
+                question: "은(Ag)판을 황산 아연(ZnSO₄) 수용액에 넣었을 때 일어나는 현상으로 옳은 것은?",
+                options: [
+                    "은판 표면에 아연이 석출된다.",
+                    "은이 산화되어 은 이온이 된다.",
+                    "수용액의 색이 푸른색으로 변한다.",
+                    "아무런 화학 반응이 일어나지 않는다."
+                ],
+                answer: 3,
+                explanation: "은(Ag)은 아연(Zn)보다 반응성이 매우 작기 때문에 전자를 잃지 않으며, 화학 반응이 일어나지 않습니다."
+            }
+        ];
+
+        // App Reactive State
+        let state = {
+            activeTab: 'lab',
+            selectedMetal: 'Zn',
+            selectedSolution: 'CuSO4',
+            isSubmerged: false,
+            animating: false,
+            speed: 1,
+            timeTick: 0,
+            transferredElectrons: 0,
+            massChangeGrams: 0,
+            particles: [],
+            solutionCationCount: 20,
+            dissolvedMetalCount: 0,
+            depositedMetalCount: 0,
+            hasReaction: false
+        };
+
+        // Quiz State
+        let quizState = {
+            currentIdx: 0,
+            userAnswers: Array(QUIZ_DATA.length).fill(null),
+            score: 0
+        };
+
+        // Canvas & Chart Setup
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        let chart = null;
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // Tab Switcher Function
+        function switchTab(tab) {
+            state.activeTab = tab;
+            const labView = document.getElementById('view-lab');
+            const quizView = document.getElementById('view-quiz');
+            const labActions = document.getElementById('lab-top-actions');
+
+            const btnLab = document.getElementById('tab-btn-lab');
+            const btnQuiz = document.getElementById('tab-btn-quiz');
+
+            if (tab === 'lab') {
+                labView.classList.remove('hidden');
+                quizView.classList.add('hidden');
+                labActions.classList.remove('hidden');
+
+                btnLab.className = "px-4 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                btnQuiz.className = "px-4 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+                
+                setTimeout(resizeCanvas, 50);
+            } else {
+                labView.classList.add('hidden');
+                quizView.classList.remove('hidden');
+                labActions.classList.add('hidden');
+
+                btnQuiz.className = "px-4 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                btnLab.className = "px-4 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+
+                renderQuizQuestion();
+            }
+        }
+
+        // Control Selectors
+        function selectMetal(key) {
+            if (state.isSubmerged) resetLab();
+            state.selectedMetal = key;
+
+            document.querySelectorAll('.metal-btn').forEach(btn => {
+                btn.className = "metal-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300";
+            });
+            document.getElementById(`metal-${key}`).className = "metal-btn p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 text-left transition";
+
+            updateUI();
+        }
+
+        function selectSolution(key) {
+            if (state.isSubmerged) resetLab();
+            state.selectedSolution = key;
+
+            document.querySelectorAll('.sol-btn').forEach(btn => {
+                btn.className = "sol-btn w-full p-2 rounded-xl border border-slate-200 bg-white text-left transition hover:border-slate-300 flex justify-between items-center";
+            });
+            document.getElementById(`sol-${key}`).className = "sol-btn w-full p-2 rounded-xl border-2 border-cyan-600 bg-cyan-50/60 text-left transition flex justify-between items-center";
+
+            updateUI();
+        }
+
+        function setSpeed(spd) {
+            state.speed = spd;
+            [1, 2, 4].forEach(s => {
+                const btn = document.getElementById(`spd-${s}`);
+                if (s === spd) {
+                    btn.className = "px-2 py-0.5 rounded-lg bg-indigo-600 text-white font-medium text-xs";
+                } else {
+                    btn.className = "px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs";
+                }
+            });
+        }
+
+        function checkReactionPossibility() {
+            const metal = METALS[state.selectedMetal];
+            const sol = SOLUTIONS[state.selectedSolution];
+            return metal.reactivity > sol.cationReactivity;
+        }
+
+        // UI & Equations Updater
+        function updateUI() {
+            const m = METALS[state.selectedMetal];
+            const s = SOLUTIONS[state.selectedSolution];
+            const hasReaction = checkReactionPossibility();
+            state.hasReaction = hasReaction;
+
+            const badge = document.getElementById('status-badge');
+            const noReactMsg = document.getElementById('no-react-msg');
+            const noReactReason = document.getElementById('no-react-reason');
+
+            if (!state.isSubmerged) {
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> 실험 대기 중`;
+                badge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5";
+                noReactMsg.classList.add('hidden');
+            } else if (hasReaction) {
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 반응 진행 중`;
+                badge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5";
+                noReactMsg.classList.add('hidden');
+            } else {
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> 반응 없음`;
+                badge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1.5";
+                noReactMsg.classList.remove('hidden');
+                noReactReason.textContent = `${m.name}(${m.symbol})의 반응성이 수용액 속 ${s.cationSymbol} 이온보다 작거나 같기 때문에 산화되지 않습니다.`;
+            }
+
+            // Highlighting activity list
+            ['Zn', 'Fe', 'H', 'Cu', 'Ag'].forEach(el => {
+                const dom = document.getElementById(`act-${el}`);
+                if (dom) {
+                    if (el === m.symbol) {
+                        dom.className = "px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold ring-2 ring-indigo-200";
+                    } else if (s.cationSymbol.includes(el)) {
+                        dom.className = "px-1.5 py-0.5 rounded bg-cyan-600 text-white font-bold ring-2 ring-cyan-200";
+                    } else {
+                        dom.className = "px-1.5 py-0.5 rounded text-slate-600";
+                    }
+                }
+            });
+
+            // Update Equations Text
+            const eqOverall = document.getElementById('eq-overall');
+            const eqOx = document.getElementById('eq-ox');
+            const eqRed = document.getElementById('eq-red');
+
+            if (!hasReaction) {
+                eqOverall.textContent = `${m.symbol} + ${s.cationSymbol} ➔ 반응 없음 (No Reaction)`;
+                eqOx.textContent = `${m.symbol} ➔ 산화되지 않음`;
+                eqRed.textContent = `${s.cationSymbol} ➔ 환원되지 않음`;
+            } else {
+                if (m.symbol === 'Zn' && s.cationSymbol === 'Cu²⁺') {
+                    eqOverall.textContent = "Zn (s) + CuSO₄ (aq) ➔ ZnSO₄ (aq) + Cu (s)";
+                    eqOx.textContent = "Zn ➔ Zn²⁺ + 2e⁻";
+                    eqRed.textContent = "Cu²⁺ + 2e⁻ ➔ Cu";
+                } else if (m.symbol === 'Cu' && s.cationSymbol === 'Ag⁺') {
+                    eqOverall.textContent = "Cu (s) + 2AgNO₃ (aq) ➔ Cu(NO₃)₂ (aq) + 2Ag (s)";
+                    eqOx.textContent = "Cu ➔ Cu²⁺ + 2e⁻";
+                    eqRed.textContent = "2Ag⁺ + 2e⁻ ➔ 2Ag";
+                } else if (s.cationSymbol === 'H⁺') {
+                    eqOverall.textContent = `${m.symbol} (s) + 2HCl (aq) ➔ ${m.symbol}Cl₂ (aq) + H₂ (g)↑`;
+                    eqOx.textContent = `${m.symbol} ➔ ${m.symbol}²⁺ + 2e⁻`;
+                    eqRed.textContent = "2H⁺ + 2e⁻ ➔ H₂↑";
+                } else {
+                    eqOverall.textContent = `${m.symbol} + ${s.name} 이온 ➔ ${m.symbol} 이온 + 금속 석출`;
+                    eqOx.textContent = `${m.symbol} ➔ ${m.symbol}ⁿ⁺ + n e⁻`;
+                    eqRed.textContent = `${s.cationSymbol} + n e⁻ ➔ 금속`;
+                }
+            }
+
+            document.getElementById('guide-cation').textContent = `수용액 양이온: ${s.cationSymbol}`;
+        }
+
+        // Particle System Setup
+        function initParticles() {
+            state.particles = [];
+            const w = canvas.width || 400;
+            const h = canvas.height || 350;
+            const solTop = h * 0.35;
+
+            const sol = SOLUTIONS[state.selectedSolution];
+            for (let i = 0; i < 20; i++) {
+                state.particles.push({
+                    type: 'cation',
+                    symbol: sol.cationSymbol,
+                    color: sol.cationColor,
+                    x: Math.random() * (w - 70) + 35,
+                    y: Math.random() * (h - solTop - 50) + solTop + 25,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: (Math.random() - 0.5) * 1.2,
+                    radius: 7
+                });
+            }
+
+            state.transferredElectrons = 0;
+            state.massChangeGrams = 0;
+            state.timeTick = 0;
+            state.dissolvedMetalCount = 0;
+            state.depositedMetalCount = 0;
+
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            document.getElementById('metric-electrons').textContent = `${state.transferredElectrons} e⁻`;
+            document.getElementById('metric-mass').textContent = `${state.massChangeGrams > 0 ? '+' : ''}${state.massChangeGrams.toFixed(2)} g`;
+            document.getElementById('live-cation-count').textContent = `녹아 나온 양이온: ${state.dissolvedMetalCount}개`;
+        }
+
+        function toggleSubmerge() {
+            state.isSubmerged = !state.isSubmerged;
+            const btnText = document.getElementById('btn-submerge-text');
+            const btn = document.getElementById('btn-submerge');
+
+            if (state.isSubmerged) {
+                btnText.textContent = "금속판 꺼내기";
+                btn.className = "px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold bg-amber-600 hover:bg-amber-700 active:scale-95 text-white shadow-sm transition flex items-center gap-1.5";
+                initParticles();
+                state.animating = true;
+            } else {
+                btnText.textContent = "수용액에 담그기";
+                btn.className = "px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white shadow-sm transition flex items-center gap-1.5";
+            }
+
+            updateUI();
+            resetChartData();
+        }
+
+        function resetLab() {
+            state.isSubmerged = false;
+            state.animating = false;
+            state.timeTick = 0;
+            state.transferredElectrons = 0;
+            state.massChangeGrams = 0;
+            
+            const btnText = document.getElementById('btn-submerge-text');
+            const btn = document.getElementById('btn-submerge');
+            btnText.textContent = "수용액에 담그기";
+            btn.className = "px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white shadow-sm transition flex items-center gap-1.5";
+
+            updateUI();
+            initParticles();
+            resetChartData();
+        }
+
+        // Canvas Rendering Loop
+        function drawLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const beakerMargin = 25;
+            const beakerTop = h * 0.32;
+            const beakerBottom = h - 15;
+
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.fillStyle = SOLUTIONS[state.selectedSolution].liquidColor;
+
+            ctx.beginPath();
+            ctx.moveTo(beakerMargin, beakerTop);
+            ctx.lineTo(beakerMargin, beakerBottom - 10);
+            ctx.quadraticCurveTo(beakerMargin, beakerBottom, beakerMargin + 10, beakerBottom);
+            ctx.lineTo(w - beakerMargin - 10, beakerBottom);
+            ctx.quadraticCurveTo(w - beakerMargin, beakerBottom, w - beakerMargin, beakerBottom - 10);
+            ctx.lineTo(w - beakerMargin, beakerTop);
+            ctx.fill();
+            ctx.stroke();
+
+            // Liquid Surface Line
+            ctx.beginPath();
+            ctx.moveTo(beakerMargin + 2, beakerTop + 8);
+            ctx.quadraticCurveTo(w / 2, beakerTop + 14, w - beakerMargin - 2, beakerTop + 8);
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+            ctx.stroke();
+
+            // Metal Strip
+            const stripWidth = 44;
+            const stripX = w / 2 - stripWidth / 2;
+            const stripTop = state.isSubmerged ? h * 0.16 : 15;
+            const stripHeight = h * 0.58;
+
+            const metal = METALS[state.selectedMetal];
+
+            ctx.fillStyle = metal.color;
+            ctx.strokeStyle = metal.border;
+            ctx.lineWidth = 2;
+            ctx.fillRect(stripX, stripTop, stripWidth, stripHeight);
+            ctx.strokeRect(stripX, stripTop, stripWidth, stripHeight);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 12px Pretendard';
+            ctx.textAlign = 'center';
+            ctx.fillText(metal.symbol, stripX + stripWidth / 2, stripTop + 22);
+
+            // Reaction Logic
+            if (state.isSubmerged && state.hasReaction) {
+                state.timeTick += state.speed;
+
+                if (Math.random() < 0.08 * state.speed && state.dissolvedMetalCount < 16) {
+                    state.transferredElectrons += 2;
+                    state.dissolvedMetalCount++;
+                    state.depositedMetalCount++;
+
+                    const sol = SOLUTIONS[state.selectedSolution];
+                    const metalMolar = metal.atomicMass;
+                    const depositedMolar = sol.cationSymbol.includes('Ag') ? 107.87 * 2 : 63.55;
+                    state.massChangeGrams = (state.depositedMetalCount * depositedMolar - state.dissolvedMetalCount * metalMolar) / 50;
+
+                    updateMetrics();
+
+                    const side = Math.random() > 0.5 ? stripX - 3 : stripX + stripWidth - 3;
+                    const depY = stripTop + stripHeight * 0.45 + (Math.random() * (stripHeight * 0.45));
+                    
+                    state.particles.push({
+                        type: 'deposited',
+                        x: side,
+                        y: depY,
+                        color: sol.cationColor,
+                        radius: 5
+                    });
+
+                    state.particles.push({
+                        type: 'cation',
+                        symbol: `${metal.symbol}²⁺`,
+                        color: metal.color,
+                        x: stripX + stripWidth / 2,
+                        y: stripTop + stripHeight - 10,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: Math.random() * 1.2 + 0.4,
+                        radius: 7
+                    });
+
+                    state.particles.push({
+                        type: 'electron',
+                        x: stripX + stripWidth / 2,
+                        y: stripTop + 25,
+                        targetY: stripTop + stripHeight - 15,
+                        radius: 3.5
+                    });
+
+                    if (chart && state.timeTick % 8 === 0) {
+                        chart.data.labels.push(`${Math.floor(state.timeTick / 8)}s`);
+                        chart.data.datasets[0].data.push(Math.max(0, 20 - state.dissolvedMetalCount));
+                        chart.data.datasets[1].data.push(state.dissolvedMetalCount);
+                        chart.update('none');
+                    }
+                }
+            }
+
+            // Particle Updates
+            state.particles.forEach((p, idx) => {
+                if (p.type === 'cation') {
+                    p.x += p.vx * (state.isSubmerged ? state.speed : 0.5);
+                    p.y += p.vy * (state.isSubmerged ? state.speed : 0.5);
+
+                    if (p.x < beakerMargin + 8 || p.x > w - beakerMargin - 8) p.vx *= -1;
+                    if (p.y < beakerTop + 15 || p.y > beakerBottom - 8) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 8px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(p.symbol, p.x, p.y + 3);
+
+                } else if (p.type === 'deposited') {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                } else if (p.type === 'electron') {
+                    p.y += 3.5 * state.speed;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.shadowColor = '#fbbf24';
+                    ctx.shadowBlur = 6;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    if (p.y >= p.targetY) {
+                        state.particles.splice(idx, 1);
+                    }
+                }
+            });
+
+            requestAnimationFrame(drawLoop);
+        }
+
+        // Initialize Chart.js
+        function initChart() {
+            const chartCtx = document.getElementById('chartCanvas').getContext('2d');
+            chart = new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0s'],
+                    datasets: [
+                        {
+                            label: '수용액 초기 양이온 수',
+                            data: [20],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 0
+                        },
+                        {
+                            label: '녹아 나온 금속 양이온 수',
+                            data: [0],
+                            borderColor: '#9333ea',
+                            backgroundColor: 'rgba(147, 51, 234, 0.08)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#475569',
+                                font: { size: 10, family: 'Pretendard' }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8', font: { size: 9 } },
+                            grid: { color: 'rgba(226, 232, 240, 0.8)' }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8', font: { size: 9 } },
+                            grid: { color: 'rgba(226, 232, 240, 0.8)' },
+                            min: 0,
+                            max: 25
+                        }
+                    }
+                }
+            });
+        }
+
+        function resetChartData() {
+            if (chart) {
+                chart.data.labels = ['0s'];
+                chart.data.datasets[0].data = [20];
+                chart.data.datasets[1].data = [0];
+                chart.update();
+            }
+        }
+
+        // --- Quiz System Logic ---
+        function renderQuizQuestion() {
+            const q = QUIZ_DATA[quizState.currentIdx];
+            document.getElementById('quiz-question').textContent = `Q${quizState.currentIdx + 1}. ${q.question}`;
+            document.getElementById('quiz-progress-text').textContent = `문제 ${quizState.currentIdx + 1} / ${QUIZ_DATA.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((quizState.currentIdx + 1) / QUIZ_DATA.length) * 100}%`;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            const selectedAns = quizState.userAnswers[quizState.currentIdx];
+
+            q.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.onclick = () => selectQuizAnswer(optIdx);
+
+                let btnStyle = "w-full text-left p-3.5 rounded-2xl border text-xs md:text-sm font-medium transition flex items-center justify-between ";
+
+                if (selectedAns === null) {
+                    btnStyle += "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 text-slate-800";
+                } else {
+                    if (optIdx === q.answer) {
+                        btnStyle += "bg-emerald-50 border-emerald-300 text-emerald-900 font-bold";
+                    } else if (selectedAns === optIdx) {
+                        btnStyle += "bg-rose-50 border-rose-300 text-rose-900 font-bold";
+                    } else {
+                        btnStyle += "bg-white border-slate-200 opacity-60 text-slate-500";
+                    }
+                }
+
+                btn.className = btnStyle;
+                btn.innerHTML = `
+                    <span>${optIdx + 1}. ${optText}</span>
+                    ${selectedAns !== null && optIdx === q.answer ? '<i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>' : ''}
+                    ${selectedAns !== null && selectedAns === optIdx && optIdx !== q.answer ? '<i data-lucide="x" class="w-4 h-4 text-rose-600"></i>' : ''}
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Explanation Display
+            const expBox = document.getElementById('quiz-explanation-box');
+            if (selectedAns !== null) {
+                expBox.classList.remove('hidden');
+                const isCorrect = selectedAns === q.answer;
+                const title = document.getElementById('quiz-result-title');
+
+                if (isCorrect) {
+                    expBox.className = "p-4 rounded-2xl border bg-emerald-50/80 border-emerald-200 text-emerald-900 text-xs md:text-sm space-y-1.5";
+                    title.className = "font-bold flex items-center gap-1.5 text-emerald-700";
+                    title.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i> 정답입니다!`;
+                } else {
+                    expBox.className = "p-4 rounded-2xl border bg-rose-50/80 border-rose-200 text-rose-900 text-xs md:text-sm space-y-1.5";
+                    title.className = "font-bold flex items-center gap-1.5 text-rose-700";
+                    title.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i> 오답입니다. (정답: ${q.answer + 1}번)`;
+                }
+
+                document.getElementById('quiz-explanation-text').textContent = q.explanation;
+            } else {
+                expBox.classList.add('hidden');
+            }
+
+            document.getElementById('btn-quiz-prev').disabled = quizState.currentIdx === 0;
+            lucide.createIcons();
+        }
+
+        function selectQuizAnswer(optIdx) {
+            if (quizState.userAnswers[quizState.currentIdx] !== null) return; // Lock after selection
+            quizState.userAnswers[quizState.currentIdx] = optIdx;
+
+            if (optIdx === QUIZ_DATA[quizState.currentIdx].answer) {
+                quizState.score++;
+            }
+
+            renderQuizQuestion();
+        }
+
+        function nextQuizQuestion() {
+            if (quizState.currentIdx < QUIZ_DATA.length - 1) {
+                quizState.currentIdx++;
+                renderQuizQuestion();
+            } else {
+                showQuizSummary();
+            }
+        }
+
+        function prevQuizQuestion() {
+            if (quizState.currentIdx > 0) {
+                quizState.currentIdx--;
+                renderQuizQuestion();
+            }
+        }
+
+        function showQuizSummary() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('btn-quiz-prev').classList.add('hidden');
+            document.getElementById('btn-quiz-next').classList.add('hidden');
+
+            const summary = document.getElementById('quiz-summary');
+            summary.classList.remove('hidden');
+
+            document.getElementById('final-score-text').textContent = `${quizState.score} / ${QUIZ_DATA.length}`;
+        }
+
+        function restartQuiz() {
+            quizState.currentIdx = 0;
+            quizState.userAnswers = Array(QUIZ_DATA.length).fill(null);
+            quizState.score = 0;
+
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('btn-quiz-prev').classList.remove('hidden');
+            document.getElementById('btn-quiz-next').classList.remove('hidden');
+            document.getElementById('quiz-summary').classList.add('hidden');
+
+            renderQuizQuestion();
+        }
+
+        // Page OnLoad Init
+        window.addEventListener('load', () => {
+            selectMetal('Zn');
+            selectSolution('CuSO4');
+            initChart();
+            resizeCanvas();
+            drawLoop();
+        });
+
+        // Toast Notification Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            if (!toast || !toastMsg) return;
+            toastMsg.textContent = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+            }, 2200);
+        }
+
+        // Safe Clipboard Copy Helper (execCommand fallback for iframe)
+        function copyToClipboard(text, successMsg) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg || '클립보드에 복사되었습니다!');
+            } catch (err) {
+                showToast('복사에 실패했습니다.');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Copy Chemical Reaction Equations
+        function copyReactionEquations() {
+            const eqOverall = document.getElementById('eq-overall').innerText.trim();
+            const eqOx = document.getElementById('eq-ox').innerText.trim();
+            const eqRed = document.getElementById('eq-red').innerText.trim();
+            
+            const text = `[산화-환원 반응식 분석]\n• 전체 반응식: ${eqOverall}\n• 산화 반반응: ${eqOx}\n• 환원 반반응: ${eqRed}`;
+            copyToClipboard(text, '화학 반응식이 클립보드에 복사되었습니다!');
+        }
+
+        // Copy Complete Experiment Summary Report
+        function copyExperimentSummary() {
+            const m = METALS[state.selectedMetal];
+            const s = SOLUTIONS[state.selectedSolution];
+            const eqOverall = document.getElementById('eq-overall').innerText.trim();
+            const eCount = state.transferredElectrons;
+            const mass = state.massChangeGrams.toFixed(2);
+            
+            const text = `[산화-환원 가상 실험 결과 보고서]\n- 실험 금속판: ${m.name} (${m.symbol})\n- 수용액: ${s.name} (${s.cationSymbol})\n- 반응 상태: ${state.hasReaction ? '화학 반응 진행됨' : '반응 없음'}\n- 전체 화학 반응식: ${eqOverall}\n- 이동한 총 전자 수: ${eCount} e⁻\n- 금속판 질량 변화량: ${mass} g`;
+            copyToClipboard(text, '실험 결과 요약이 클립보드에 복사되었습니다!');
+        }
+    </script>
+</body>
+</html>
