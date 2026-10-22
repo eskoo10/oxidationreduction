@@ -205,7 +205,7 @@
                 <div class="absolute bottom-2.5 left-2.5 bg-white/90 backdrop-blur border border-slate-200 px-2.5 py-1.5 rounded-xl text-[11px] space-y-1 text-slate-700 shadow-sm pointer-events-none">
                     <div class="flex items-center gap-1.5">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block ring-1 ring-amber-300"></span>
-                        <span>전자 ($e^-$) 이동</span>
+                        <span>전자 (e⁻) 이동</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
@@ -295,7 +295,7 @@
                     <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                         <i data-lucide="trending-up" class="w-4 h-4 text-purple-600"></i> 수용액 속 이온 수 변화
                     </h3>
-                    <span class="text-[10px] text-slate-400">시간 경과 ($t$)</span>
+                    <span class="text-[10px] text-slate-400">시간 경과 (t)</span>
                 </div>
 
                 <!-- Canvas Chart Container -->
@@ -334,7 +334,7 @@
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
                     <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">통합과학 산화·환원 체크</span>
-                    <h2 class="text-xl font-bold text-slate-900 mt-1">개념 확인 퀴즈</h2>
+                    <h2 class="text-xl font-bold text-slate-900 mt-1">개념 확인 퀴즈 (랜덤 5문항)</h2>
                 </div>
                 <div class="text-right">
                     <span id="quiz-progress-text" class="text-sm font-bold text-slate-700 code-font">문제 1 / 5</span>
@@ -390,7 +390,7 @@
                     <span id="final-score-text" class="text-3xl font-black text-indigo-600 code-font">5 / 5</span>
                 </div>
                 <button onclick="restartQuiz()" class="px-6 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition inline-flex items-center gap-2">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 다시 풀기
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 새로운 5문제 다시 풀기
                 </button>
             </div>
 
@@ -428,8 +428,8 @@
             'HCl':   { name: '묽은 염산', cationSymbol: 'H⁺', cationReactivity: 3, valency: 1, liquidColor: 'rgba(251, 191, 36, 0.12)', cationColor: '#d97706' }
         };
 
-        // Quiz Questions Data
-        const QUIZ_DATA = [
+        // 30 Question Bank for High School Integrated Science
+        const ALL_QUIZ_DATA = [
             {
                 question: "아연(Zn) 조각을 황산 구리(CuSO₄) 수용액에 넣었을 때 일어나는 변화로 옳은 것은?",
                 options: [
@@ -439,7 +439,7 @@
                     "수용액의 푸른색이 점점 더 짙어진다."
                 ],
                 answer: 2,
-                explanation: "반응성이 큰 아연(Zn)은 전자를 잃고 산화되어 Zn²⁺로 녹아 나오고, 구리 이온(Cu²⁺)은 전자를 얻어 환원되어 아연판 표면에 붉은색 구리(Cu)로 석출됩니다. Cu²⁺ 이온이 줄어들므로 푸른색은 옅어집니다."
+                explanation: "반응성이 큰 아연(Zn)은 전자를 잃고 산화되어 Zn²⁺로 녹아 나오고, 구리 이온(Cu²⁺)은 전자를 얻어 환원되어 아연판 표면에 붉은색 구리(Cu)로 석출됩니다."
             },
             {
                 question: "구리(Cu)판을 질산 은(AgNO₃) 수용액에 넣었을 때, 수용액 속 전체 양이온 수의 변화는?",
@@ -447,7 +447,7 @@
                     "전체 양이온 수가 증가한다.",
                     "전체 양이온 수가 감소한다.",
                     "전체 양이온 수에는 변화가 없다.",
-                    "음이온 수는 줄어들고 양이온 수는 늘어난다."
+                    "음이온 수만 감소한다."
                 ],
                 answer: 1,
                 explanation: "Cu 1개가 녹아 나올 때 Cu²⁺(1개)가 되고, 은 이온 Ag⁺ 2개가 은(Ag)으로 석출됩니다. 즉 2개의 Ag⁺가 사라질 때 1개의 Cu²⁺가 생성되므로 수용액 속 전체 양이온 수는 감소합니다."
@@ -461,7 +461,7 @@
                     "마그네슘 (Mg)"
                 ],
                 answer: 2,
-                explanation: "구리(Cu)는 수소(H)보다 이온화 경향(반응성)이 작기 때문에 묽은 염산 속 H⁺ 이온에 전자를 줄 수 없어 수소 기체가 발생하지 않습니다."
+                explanation: "구리(Cu)는 수소(H)보다 반응성(이온화 경향)이 작기 때문에 묽은 염산 속 H⁺ 이온에 전자를 줄 수 없어 수소 기체가 발생하지 않습니다."
             },
             {
                 question: "산화-환원 반응에 대한 설명으로 옳지 않은 것은?",
@@ -469,7 +469,7 @@
                     "산화와 환원은 항상 동시에 일어난다.",
                     "전자를 잃는 반응을 산화라고 한다.",
                     "전자를 얻는 반응을 환원이라고 한다.",
-                    "산화 반응에서 잃은 전자 수보다 환원 반응에서 얻은 전자 수가 더 많다."
+                    "산화 반응에서 잃은 전자 수보다 환원 반응에서 얻은 전자 수가 더 많을 수 있다."
                 ],
                 answer: 3,
                 explanation: "산화-환원 반응의 동시성에 의해, 산화될 때 잃은 총 전자 수와 환원될 때 얻은 총 전자 수는 항상 같습니다."
@@ -484,6 +484,259 @@
                 ],
                 answer: 3,
                 explanation: "은(Ag)은 아연(Zn)보다 반응성이 매우 작기 때문에 전자를 잃지 않으며, 화학 반응이 일어나지 않습니다."
+            },
+            {
+                question: "산소의 이동에 따른 산화-환원 정의에서 옳은 설명은?",
+                options: [
+                    "물질이 산소를 얻는 반응을 산화라고 한다.",
+                    "물질이 산소를 잃는 반응을 산화라고 한다.",
+                    "산소를 얻는 반응과 산소를 잃는 반응은 독립적으로 일어난다.",
+                    "산소를 잃는 물질은 산화되었다고 한다."
+                ],
+                answer: 0,
+                explanation: "산소에 의한 산화-환원 정의에서 물질이 산소를 얻는 반응을 산화, 산소를 잃는 반응을 환원이라고 합니다."
+            },
+            {
+                question: "구리 가루를 공기 중에서 가열할 때 일어나는 반응(2Cu + O₂ → 2CuO)에 대한 설명으로 옳은 것은?",
+                options: [
+                    "구리는 산소를 잃고 환원된다.",
+                    "구리는 산소를 얻어 산화된다.",
+                    "산소는 전자를 잃고 산화된다.",
+                    "반응 후 구리 물질의 질량은 감소한다."
+                ],
+                answer: 1,
+                explanation: "붉은색 구리가 공기 중의 산소와 결합하여 검은색 산화 구리(II)(CuO)가 되므로, 구리는 산소를 얻어 산화됩니다."
+            },
+            {
+                question: "산화 구리(II)(CuO)와 탄소 가루(C)를 섞어 가열하는 반응(2CuO + C → 2Cu + CO₂)에 대한 설명으로 옳지 않은 것은?",
+                options: [
+                    "CuO는 산소를 잃고 구리(Cu)로 환원된다.",
+                    "탄소(C)는 산소를 얻어 이산화 탄소(CO₂)로 산화된다.",
+                    "산화와 환원이 동시에 일어난다.",
+                    "CuO는 전자를 잃고 산화된다."
+                ],
+                answer: 3,
+                explanation: "CuO 속 구리 이온(Cu²⁺)은 전자를 얻어 구리(Cu) 원자로 환원됩니다."
+            },
+            {
+                question: "광합성 반응(6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂)에 대한 설명 중 옳은 것은?",
+                options: [
+                    "광합성과 세포 호흡은 모두 산화-환원 반응이다.",
+                    "광합성에서는 산화 반응만 일어난다.",
+                    "세포 호흡에서는 환원 반응만 일어난다.",
+                    "이산화 탄소가 포도당으로 변하는 것은 산화 반응이다."
+                ],
+                answer: 0,
+                explanation: "생명체 내에서 일어나는 광합성과 세포 호흡은 모두 대표적인 산화-환원 반응입니다."
+            },
+            {
+                question: "철이 녹스는 현상(부식)을 방지하는 방법으로 적절하지 않은 것은?",
+                options: [
+                    "철 표면에 페인트나 기름을 바른다.",
+                    "철 표면에 아연을 도금한다(함석).",
+                    "철 표면에 묽은 염산을 주기적으로 바른다.",
+                    "철에 크로뮴이나 니켈을 섞어 스테인리스강을 만든다."
+                ],
+                answer: 2,
+                explanation: "묽은 염산은 철과 반응하여 수소 기체를 발생시키며 철의 부식을 크게 촉진하므로 방지법으로 적절하지 않습니다."
+            },
+            {
+                question: "철 표면에 아연을 도금한 '함석'에 흠집이 생겨도 철이 쉽게 녹슬지 않는 이유는?",
+                options: [
+                    "아연이 철보다 반응성이 커서 먼저 산화되기 때문이다.",
+                    "아연이 철보다 반응성이 작아서 철을 보호하기 때문이다.",
+                    "아연이 주변의 산소를 모두 흡수하기 때문이다.",
+                    "아연과 철이 반응하여 은으로 변하기 때문이다."
+                ],
+                answer: 0,
+                explanation: "아연(Zn)은 철(Fe)보다 반응성이 크므로 흠집이 생겼을 때 아연이 먼저 전자를 잃고 산화되어 철의 부식을 막아줍니다 (희생 양극법)."
+            },
+            {
+                question: "철 표면에 주석(Sn)을 도금한 '양철캔'에 흠집이 생겼을 때 나타나는 현상은?",
+                options: [
+                    "철이 주석보다 반응성이 커서 철이 더 빠르게 녹슨다.",
+                    "주석이 철보다 반응성이 커서 먼저 산화된다.",
+                    "흠집이 생겨도 부식 속도에는 아무런 변화가 없다.",
+                    "주석이 녹아 나와 흠집을 자동으로 메운다."
+                ],
+                answer: 0,
+                explanation: "주석(Sn)은 철(Fe)보다 반응성이 작기 때문에, 흠집이 나면 철이 주석 대신 전자를 잃고 훨씬 빠르게 산화(녹슬게)됩니다."
+            },
+            {
+                question: "사과를 깎아 두었을 때 표면이 갈색으로 변하는 갈변 현상을 막는 적절한 방법은?",
+                options: [
+                    "소금물이나 레몬즙에 담가 산소 접촉 및 효소 작용을 차단한다.",
+                    "따뜻한 물에 담가 산화 반응 속도를 높인다.",
+                    "공기 중에 오래 방치하여 산화를 완료시킨다.",
+                    "햇빛 아래에 놓아 온도를 높인다."
+                ],
+                answer: 0,
+                explanation: "소금물이나 산성 수용액(레몬즙)은 산소와의 접촉을 차단하고 효소 활성을 억제하여 갈변(산화) 현상을 막아줍니다."
+            },
+            {
+                question: "메테인(CH₄)의 연소 반응(CH₄ + 2O₂ → CO₂ + 2H₂O)에 대한 설명으로 옳은 것은?",
+                options: [
+                    "메테인(CH₄)은 산소를 얻어 산화된다.",
+                    "산소 기체(O₂)는 산소를 얻어 산화된다.",
+                    "연소 반응은 환원만 단독으로 일어나는 반응이다.",
+                    "반응 후 생성되는 물은 산화되지 않는 유일한 물질이다."
+                ],
+                answer: 0,
+                explanation: "연소 반응은 물질이 산소와 빠르게 결합하면서 열과 빛을 내는 반응으로, 메테인은 산소를 얻어 이산화 탄소와 물로 산화됩니다."
+            },
+            {
+                question: "금속의 이온화 경향(반응성)이 큰 금속일수록 갖는 주요 특징은?",
+                options: [
+                    "전자를 잃고 양이온이 되기 쉽다.",
+                    "전자를 얻고 음이온이 되기 쉽다.",
+                    "반응성이 작아 공기 중에서 잘 변하지 않는다.",
+                    "수용액 속에서 금속 원자로 잘 석출된다."
+                ],
+                answer: 0,
+                explanation: "이온화 경향이 큰 금속은 전자를 쉽게 잃고 양이온이 되려는 성질(산화되기 쉬움)이 강합니다."
+            },
+            {
+                question: "마그네슘(Mg) 조각을 묽은 염산(HCl)에 넣었을 때의 반응으로 옳은 것은?",
+                options: [
+                    "마그네슘은 전자를 잃고 Mg²⁺로 산화된다.",
+                    "수소 이온(H⁺)은 전자를 잃고 산화된다.",
+                    "염화 이온(Cl⁻)이 전자를 얻어 수소 기체가 된다.",
+                    "반응 후 아무런 기체도 발생하지 않는다."
+                ],
+                answer: 0,
+                explanation: "마그네슘은 수소보다 반응성이 크므로 전자를 잃고 Mg²⁺로 산화되며, 수소 이온(H⁺)은 전자를 얻어 수소 기체(H₂)로 환원됩니다."
+            },
+            {
+                question: "철(Fe) 못을 황산 구리(CuSO₄) 수용액에 넣었을 때 일어나는 변화로 옳은 것은?",
+                options: [
+                    "철 못 표면에 붉은색 구리(Cu)가 석출된다.",
+                    "철은 전자를 얻어 환원된다.",
+                    "구리 이온(Cu²⁺)은 전자를 잃고 산화된다.",
+                    "수용액의 푸른색이 점점 더 짙어진다."
+                ],
+                answer: 0,
+                explanation: "철(Fe)은 구리(Cu)보다 반응성이 크므로 철이 Fe²⁺로 산화되어 녹아 나오고, Cu²⁺는 전자를 얻어 철 못 표면에 붉은색 구리(Cu)로 환원 석출됩니다."
+            },
+            {
+                question: "다음 반응 중 대표적인 산화-환원 반응이 아닌 것은?",
+                options: [
+                    "광합성과 세포 호흡",
+                    "염산과 수산화 나트륨의 중화 반응",
+                    "철이 녹오는 현상",
+                    "도시가스(메테인)의 연소"
+                ],
+                answer: 1,
+                explanation: "산과 염기가 반응하여 물과 염을 생성하는 중화 반응은 전자의 이동이나 산화수 변화가 없으므로 산화-환원 반응이 아닙니다."
+            },
+            {
+                question: "표백제나 소독제가 색소나 세균을 제거하는 주요 화학적 원리는?",
+                options: [
+                    "강한 산화력이나 환원력으로 색소 및 단백질 구조를 변형시킨다.",
+                    "중화 반응을 통해 중성 물질로 변화시킨다.",
+                    "앙금 생성 반응을 통해 불순물을 침전시킨다.",
+                    "물리적인 마찰력으로 때를 떼어낸다."
+                ],
+                answer: 0,
+                explanation: "표백제나 소독제(과산화수소, 차아염소산 나트륨 등)는 강력한 산화 작용을 통해 색소 분자나 세균 단백질을 산화시켜 파괴합니다."
+            },
+            {
+                question: "오존(O₃)을 이용한 공기 정화 및 탈취 장치의 작동 원리로 옳은 것은?",
+                options: [
+                    "오존의 강력한 산화력으로 냄새 원인 물질을 분해한다.",
+                    "오존이 냄새 분자와 결합하여 중화 반응을 일으킨다.",
+                    "오존이 수증기를 흡수하여 습도를 조절한다.",
+                    "오존이 냄새 분자를 바닥으로 침전시킨다."
+                ],
+                answer: 0,
+                explanation: "오존은 매우 뛰어난 산화력을 가지고 있어 악취 분자나 세균을 산화시켜 이산화 탄소와 물 등으로 분해합니다."
+            },
+            {
+                question: "구리(Cu)선을 질산 은(AgNO₃) 수용액에 넣었을 때 수용액의 색이 푸른색으로 변하는 이유는?",
+                options: [
+                    "구리가 전자를 잃고 푸른색의 Cu²⁺ 이온으로 녹아 나오기 때문이다.",
+                    "은 이온(Ag⁺)이 산화되어 푸른색을 띠기 때문이다.",
+                    "질산 이온(NO₃⁻)이 분해되면서 푸른빛을 발하기 때문이다.",
+                    "석출된 은 입자가 빛을 산란시키기 때문이다."
+                ],
+                answer: 0,
+                explanation: "구리는 은보다 반응성이 크므로 산화되어 푸른색을 띠는 Cu²⁺ 이온으로 수용액 속에 녹아 나옵니다."
+            },
+            {
+                question: "다음 화학 반응식 중 산화-환원 반응이 아닌 것은?",
+                options: [
+                    "Zn + Cu²⁺ → Zn²⁺ + Cu",
+                    "Mg + 2H⁺ → Mg²⁺ + H₂",
+                    "Ag⁺ + Cl⁻ → AgCl",
+                    "2Na + Cl₂ → 2NaCl"
+                ],
+                answer: 2,
+                explanation: "Ag⁺ + Cl⁻ → AgCl 반응은 은 이온과 염화 이온이 결합하여 흰색 앙금을 만드는 반응으로, 전자의 이동이나 산화수 변화가 없는 앙금 생성 반응입니다."
+            },
+            {
+                question: "산화제(Oxidizing agent)에 대한 올바른 정의는?",
+                options: [
+                    "자신은 환원되면서 다른 물질을 산화시키는 물질",
+                    "자신은 산화되면서 다른 물질을 환원시키는 물질",
+                    "항상 전자를 잃고 양이온이 되는 물질",
+                    "산소 원자를 방출하지 않고 흡수하는 물질"
+                ],
+                answer: 0,
+                explanation: "산화제는 남을 산화시키는 물질이므로, 그 과정에서 자신은 전자를 얻거나 산소를 잃어 환원됩니다."
+            },
+            {
+                question: "금속의 이온화 경향 순서(Zn > Fe > Cu > Ag)를 바탕으로 할 때, 실제로 일어날 수 있는 반응은?",
+                options: [
+                    "Zn + Cu²⁺ → Zn²⁺ + Cu",
+                    "Cu + Fe²⁺ → Cu²⁺ + Fe",
+                    "Ag + Zn²⁺ → Ag⁺ + Zn",
+                    "Cu + 2H⁺ → Cu²⁺ + H₂"
+                ],
+                answer: 0,
+                explanation: "아연(Zn)은 구리(Cu)보다 반응성이 크므로 전자를 Cu²⁺에게 주고 자신은 Zn²⁺로 산화되는 반응이 자발적으로 일어납니다."
+            },
+            {
+                question: "식물의 광합성 과정에서 이산화 탄소(CO₂)가 포도당(C₆H₁₂O₆)으로 변할 때 일어나는 변화는?",
+                options: [
+                    "수소와 전자를 얻어 환원된다.",
+                    "산소를 얻어 산화된다.",
+                    "전자를 잃고 산화된다.",
+                    "아무런 산화-환원 변화가 없다."
+                ],
+                answer: 0,
+                explanation: "광합성에서 CO₂는 수소와 전자를 얻어 포도당(C₆H₁₂O₆)으로 환원됩니다."
+            },
+            {
+                question: "산화 구리(II)(CuO) 시험관에 수소 기체(H₂)를 넣고 가열할 때(CuO + H₂ → Cu + H₂O) 일어나는 현상은?",
+                options: [
+                    "검은색 CuO가 붉은색 Cu로 환원되고, H₂는 H₂O로 산화된다.",
+                    "CuO는 산화되고 H₂는 환원된다.",
+                    "CuO와 H₂ 모두 전자를 잃고 산화된다.",
+                    "아무런 색깔 변화나 반응이 일어나지 않는다."
+                ],
+                answer: 0,
+                explanation: "검은색 산화 구리(II)는 산소를 잃고 붉은색 구리로 환원되며, 수소 기체는 산소를 얻어 물로 산화됩니다."
+            },
+            {
+                question: "변색된 은(Ag) 제품(Ag₂S)을 알루미늄 박과 소금물에 넣어 깨끗하게 되돌리는 원리는?",
+                options: [
+                    "반응성이 큰 알루미늄이 산화되면서 은 이온을 은(Ag)으로 환원시킨다.",
+                    "알루미늄이 환원되면서 은을 산화시킨다.",
+                    "소금물의 산성 성분이 녹을 녹여낸다.",
+                    "은 이온이 염화 이온과 반응하여 앙금을 만든다."
+                ],
+                answer: 0,
+                explanation: "알루미늄(Al)은 은(Ag)보다 반응성이 매우 크므로 알루미늄이 전자를 잃고 산화될 때 발생하는 전자가 Ag⁺에 전달되어 순수한 은(Ag)으로 환원 복원됩니다."
+            },
+            {
+                question: "세포 호흡(C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 에너지) 반응에 대한 설명으로 옳은 것은?",
+                options: [
+                    "포도당이 산소와 반응하여 산화되면서 에너지를 방출한다.",
+                    "포도당은 환원되고 산소는 산화된다.",
+                    "호흡은 이산화 탄소를 얻어 환원되는 반응만 일어난다.",
+                    "호흡은 산화-환원 반응에 해당하지 않는다."
+                ],
+                answer: 0,
+                explanation: "세포 호흡은 포도당이 산소에 의해 이산화 탄소와 물로 산화되면서 생명 활동에 필요한 ATP 에너지를 방출하는 대표적인 생체 산화 반응입니다."
             }
         ];
 
@@ -505,10 +758,11 @@
             hasReaction: false
         };
 
-        // Quiz State
+        // Quiz Session State
         let quizState = {
+            quizQuestions: [],
             currentIdx: 0,
-            userAnswers: Array(QUIZ_DATA.length).fill(null),
+            userAnswers: [],
             score: 0
         };
 
@@ -524,6 +778,31 @@
             canvas.height = rect.height;
         }
         window.addEventListener('resize', resizeCanvas);
+
+        // Helper to pick 5 random questions from 30-item pool
+        function getNewRandomQuestions() {
+            const shuffled = [...ALL_QUIZ_DATA];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, 5);
+        }
+
+        // Initialize or Restart Quiz Session
+        function startNewQuizSession() {
+            quizState.quizQuestions = getNewRandomQuestions();
+            quizState.currentIdx = 0;
+            quizState.userAnswers = Array(quizState.quizQuestions.length).fill(null);
+            quizState.score = 0;
+
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('btn-quiz-prev').classList.remove('hidden');
+            document.getElementById('btn-quiz-next').classList.remove('hidden');
+            document.getElementById('quiz-summary').classList.add('hidden');
+
+            renderQuizQuestion();
+        }
 
         // Tab Switcher Function
         function switchTab(tab) {
@@ -552,7 +831,11 @@
                 btnQuiz.className = "px-4 py-1.5 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
                 btnLab.className = "px-4 py-1.5 rounded-lg text-xs md:text-sm font-medium transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
 
-                renderQuizQuestion();
+                if (quizState.quizQuestions.length === 0) {
+                    startNewQuizSession();
+                } else {
+                    renderQuizQuestion();
+                }
             }
         }
 
@@ -965,10 +1248,12 @@
 
         // --- Quiz System Logic ---
         function renderQuizQuestion() {
-            const q = QUIZ_DATA[quizState.currentIdx];
+            if (!quizState.quizQuestions || quizState.quizQuestions.length === 0) return;
+
+            const q = quizState.quizQuestions[quizState.currentIdx];
             document.getElementById('quiz-question').textContent = `Q${quizState.currentIdx + 1}. ${q.question}`;
-            document.getElementById('quiz-progress-text').textContent = `문제 ${quizState.currentIdx + 1} / ${QUIZ_DATA.length}`;
-            document.getElementById('quiz-progress-bar').style.width = `${((quizState.currentIdx + 1) / QUIZ_DATA.length) * 100}%`;
+            document.getElementById('quiz-progress-text').textContent = `문제 ${quizState.currentIdx + 1} / ${quizState.quizQuestions.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((quizState.currentIdx + 1) / quizState.quizQuestions.length) * 100}%`;
 
             const optionsContainer = document.getElementById('quiz-options');
             optionsContainer.innerHTML = '';
@@ -1029,10 +1314,10 @@
         }
 
         function selectQuizAnswer(optIdx) {
-            if (quizState.userAnswers[quizState.currentIdx] !== null) return; // Lock after selection
+            if (quizState.userAnswers[quizState.currentIdx] !== null) return; // Lock choice
             quizState.userAnswers[quizState.currentIdx] = optIdx;
 
-            if (optIdx === QUIZ_DATA[quizState.currentIdx].answer) {
+            if (optIdx === quizState.quizQuestions[quizState.currentIdx].answer) {
                 quizState.score++;
             }
 
@@ -1040,7 +1325,7 @@
         }
 
         function nextQuizQuestion() {
-            if (quizState.currentIdx < QUIZ_DATA.length - 1) {
+            if (quizState.currentIdx < quizState.quizQuestions.length - 1) {
                 quizState.currentIdx++;
                 renderQuizQuestion();
             } else {
@@ -1063,20 +1348,11 @@
             const summary = document.getElementById('quiz-summary');
             summary.classList.remove('hidden');
 
-            document.getElementById('final-score-text').textContent = `${quizState.score} / ${QUIZ_DATA.length}`;
+            document.getElementById('final-score-text').textContent = `${quizState.score} / ${quizState.quizQuestions.length}`;
         }
 
         function restartQuiz() {
-            quizState.currentIdx = 0;
-            quizState.userAnswers = Array(QUIZ_DATA.length).fill(null);
-            quizState.score = 0;
-
-            document.getElementById('quiz-container').classList.remove('hidden');
-            document.getElementById('btn-quiz-prev').classList.remove('hidden');
-            document.getElementById('btn-quiz-next').classList.remove('hidden');
-            document.getElementById('quiz-summary').classList.add('hidden');
-
-            renderQuizQuestion();
+            startNewQuizSession();
         }
 
         // Page OnLoad Init
@@ -1086,6 +1362,7 @@
             initChart();
             resizeCanvas();
             drawLoop();
+            startNewQuizSession();
         });
 
         // Toast Notification Helper
